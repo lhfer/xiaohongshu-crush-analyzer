@@ -183,7 +183,7 @@ xiaohongshu-crush-analyzer/
 │   └── analysis-framework.md      # 9 维分析框架 + 心理学理论详解
 ├── examples/
 │   └── sample-report-structure.md # 报告 7 个 Tab 的结构说明
-├── demo/
+├── docs/
 │   └── index.html                 # Live Demo（真实报告，已脱敏）
 ├── assets/                        # 图片资源
 ├── LICENSE
