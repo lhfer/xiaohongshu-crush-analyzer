@@ -14,8 +14,12 @@
 </p>
 
 <p align="center">
+  <a href="https://lhfer.github.io/xiaohongshu-crush-analyzer/">👉 点击体验 Live Demo（真实报告效果）👈</a>
+</p>
+
+<p align="center">
   <a href="#-30-秒看懂它能干嘛">看懂它</a>&nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="#-效果预览">效果预览</a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://lhfer.github.io/xiaohongshu-crush-analyzer/">Live Demo</a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-安装只需-1-分钟">安装</a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-使用方法">使用</a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-faq">FAQ</a>
@@ -42,24 +46,61 @@
 
 ## 🖼 效果预览
 
+### 先看报告长什么样
+
 <p align="center">
-  <img src="assets/demo-preview.svg" alt="报告预览" width="800"/>
+  <a href="https://lhfer.github.io/xiaohongshu-crush-analyzer/">
+    <img src="assets/demo-preview.svg" alt="点击体验完整 Demo" width="800"/>
+  </a>
 </p>
 
-<details>
-<summary><strong>报告包含 7 个 Tab（点击展开详情）</strong></summary>
+<p align="center">
+  <a href="https://lhfer.github.io/xiaohongshu-crush-analyzer/">
+    <img src="https://img.shields.io/badge/🔮_点击体验完整报告-Live_Demo-FF2442?style=for-the-badge" alt="Live Demo"/>
+  </a>
+</p>
 
-| Tab | 你能看到什么 |
-|-----|-------------|
-| **📊 总览** | 一句话概括 TA 是什么样的人 + 五维雷达图 + 核心标签 |
-| **🔍 深度画像** | 9 个维度逐一分析：人口学、消费力、Big Five 人格、社交偏好… |
-| **💜 理想型画像** | TA 会被什么样的人吸引？6 维度推断 + **匹配度自测工具** |
-| **📋 笔记一览** | TA 的全部笔记，可搜索、可筛选、可排序 |
-| **🎯 追求策略** | 5 阶段路线图，每步有具体行动 + 3 种应对分支 |
-| **💬 话术锦囊** | 量身定制的评论话术、私信开场白、转微信话术 |
-| **ℹ️ 方法论** | 数据来源、分析逻辑、局限性声明，让你知其然也知其所以然 |
+> 上面是一份真实分析报告的 Demo（已脱敏）。7 个 Tab 全部可交互 — 雷达图、匹配度自测、笔记搜索筛选全能点。
 
-</details>
+### 报告里有什么？
+
+| Tab | 你能看到什么 | 亮点 |
+|-----|-------------|------|
+| **📊 总览** | 一句话概括 TA + 五维雷达图 + 核心标签 | 30 秒了解一个人 |
+| **🔍 深度画像** | 9 维度逐一分析 + Big Five 人格 + 置信度 | 每条推断都有证据链 |
+| **💜 理想型画像** | TA 会被什么人吸引？6 维推断 + 匹配度自测 | **你能给自己打分，看和 TA 多配** |
+| **📋 笔记一览** | 全部笔记列表，可搜索、可按分类筛选 | 快速找到话题切入点 |
+| **🎯 追求策略** | 5 阶段路线图 + 每步的分支应对 | **TA 回了怎么办、不回怎么办都有** |
+| **💬 话术锦囊** | 评论话术 + 私信开场白 + 转微信话术 | 基于 TA 真实内容量身定制 |
+| **ℹ️ 方法论** | 数据来源 + 分析逻辑 + 局限性声明 | 知其然也知其所以然 |
+
+### 两个最核心的 Tab
+
+<table>
+<tr>
+<td width="50%">
+
+**💜 理想型画像 — TA 到底喜欢什么样的人？**
+
+基于 5 大心理学理论 + 收藏夹行为分析，从 6 个维度推断 TA 的理想型。每个维度都有证据链。
+
+还有 **交互式匹配度自测** — 拖动滑块给自己打分，实时计算你和 TA 的匹配度百分比。
+
+</td>
+<td width="50%">
+
+**🎯 追求策略 — 不是鸡汤，是作战地图**
+
+5 个阶段从 "刷存在感" 到 "关系升温"，每个阶段：
+- 具体该做什么（选哪条笔记评论、说什么）
+- 对方可能的 3 种反应
+- 每种反应的应对方案
+
+话术全部基于 TA 的真实笔记内容定制。
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -142,6 +183,8 @@ xiaohongshu-crush-analyzer/
 │   └── analysis-framework.md      # 9 维分析框架 + 心理学理论详解
 ├── examples/
 │   └── sample-report-structure.md # 报告 7 个 Tab 的结构说明
+├── demo/
+│   └── index.html                 # Live Demo（真实报告，已脱敏）
 ├── assets/                        # 图片资源
 ├── LICENSE
 └── README.md                      # 你在看的这个

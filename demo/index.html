@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行者小K · 画像与追求策略</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #fff9f5 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(255, 36, 66, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #FF2442;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .tab-navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: #f5f5f5;
+            color: #666;
+            cursor: pointer;
+            border-radius: 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .tab-button:hover {
+            background: #ffe8ed;
+            color: #FF2442;
+        }
+
+        .tab-button.active {
+            background: #FF2442;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #FF2442 0%, #ff6b8a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .tag {
+            background: #ffe8ed;
+            color: #FF2442;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #FF2442;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF2442;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .radar-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-bottom: 40px;
+        }
+
+        .dimension-item {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FF2442;
+        }
+
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .dimension-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .confidence-badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .confidence-high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .confidence-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .confidence-low {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .dimension-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .big5-chart {
+            width: 100%;
+            height: 350px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #FF2442;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #FF2442;
+            background: white;
+            color: #FF2442;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #FF2442;
+            color: white;
+        }
+
+        .strategy-section {
+            margin-bottom: 30px;
+        }
+
+        .strategy-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FF2442;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FF2442;
+        }
+
+        .do-dont-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .do-list, .dont-list {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .do-list {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+        }
+
+        .dont-list {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+
+        .do-list h4, .dont-list h4 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .do-list h4 {
+            color: #22c55e;
+        }
+
+        .dont-list h4 {
+            color: #ef4444;
+        }
+
+        .do-list li, .dont-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .phase-card {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #FF2442;
+        }
+
+        .phase-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF2442;
+            margin-bottom: 15px;
+        }
+
+        .phase-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .example-text {
+            background: white;
+            padding: 15px;
+            border-left: 3px solid #FF2442;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .branching {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .branching-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .branching-item::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #FF2442;
+            font-weight: bold;
+        }
+
+        .assessment-container {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .slider-group {
+            margin-bottom: 30px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .slider-value {
+            color: #FF2442;
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #FF2442;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #FF2442;
+            cursor: pointer;
+            border: none;
+        }
+
+        .match-result {
+            background: linear-gradient(135deg, #FF2442 0%, #ff6b8a 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .match-result.show {
+            display: block;
+        }
+
+        .match-percentage {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .match-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .match-feedback {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .method-section {
+            margin-bottom: 30px;
+        }
+
+        .method-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FF2442;
+            margin-bottom: 15px;
+        }
+
+        .method-content {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .disclaimer {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #FF2442;
+            box-shadow: 0 0 0 3px rgba(255, 36, 66, 0.1);
+        }
+
+        .likes-badge {
+            background: #ffe8ed;
+            color: #FF2442;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .ideal-radar {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-bottom: 40px;
+        }
+
+        .ideal-dimension {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .ideal-dimension-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FF2442;
+        }
+
+        .ideal-dimension-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .ideal-dimension-score {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FF2442;
+        }
+
+        .ideal-dimension-desc {
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .theory-box {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .theory-label {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .do-dont-container {
+                grid-template-columns: 1fr;
+            }
+
+            .ideal-dimension {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">🎯 旅行者小K · 画像与追求策略</div>
+            <div class="header-subtitle">基于社交媒体数据的深度人格分析与恋爱攻略</div>
+            <div class="header-subtitle" style="font-size: 13px; color: #999;">数据更新时间: 2026-03-10</div>
+        </header>
+
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('overview')">📊 总览</button>
+            <button class="tab-button" onclick="switchTab('profile')">🔍 深度画像</button>
+            <button class="tab-button" onclick="switchTab('ideal')">💜 理想型推断</button>
+            <button class="tab-button" onclick="switchTab('notes')">📋 笔记一览</button>
+            <button class="tab-button" onclick="switchTab('strategy')">🎯 追求策略</button>
+            <button class="tab-button" onclick="switchTab('tactics')">💬 话术锦囊</button>
+            <button class="tab-button" onclick="switchTab('method')">ℹ️ 方法论</button>
+        </div>
+
+        <!-- TAB 1: 总览 -->
+        <div id="overview" class="tab-content active">
+            <div class="summary-box">
+                一个IT咨询师、环球旅行家和音乐追梦人——用脚步丈量已踏足的75个国家，用音乐连接世界，在北京扎根却永远向往远方。
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #333;">核心标签</h3>
+            <div class="tags-container">
+                <span class="tag">环球旅行家</span>
+                <span class="tag">IT咨询</span>
+                <span class="tag">北漂</span>
+                <span class="tag">音乐控</span>
+                <span class="tag">独立买房</span>
+                <span class="tag">巨蟹座暖男</span>
+                <span class="tag">75/195国家签证持有者</span>
+                <span class="tag">自我成长</span>
+                <span class="tag">深度思考者</span>
+                <span class="tag">摄影师</span>
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">基础数据</h3>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">5,272</div>
+                    <div class="stat-label">粉丝</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">91</div>
+                    <div class="stat-label">关注</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5.2万</div>
+                    <div class="stat-label">获赞与收藏</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">62</div>
+                    <div class="stat-label">笔记数</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">个性五维雷达图</h3>
+            <div class="radar-container">
+                <canvas id="overviewRadar"></canvas>
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">基本信息</h3>
+            <div class="stats">
+                <div class="stat-card">
+                    <div style="font-size: 14px; margin-bottom: 10px;">年龄</div>
+                    <div class="stat-number" style="color: #333; font-size: 22px;">31岁</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">约生于1994年</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 14px; margin-bottom: 10px;">旅行成就</div>
+                    <div class="stat-number" style="color: #333; font-size: 22px;">75/195 🌍</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">已踏足全球195国中的75个</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 14px; margin-bottom: 10px;">城市</div>
+                    <div class="stat-number" style="color: #333; font-size: 22px;">北京</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">海淀区</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 14px; margin-bottom: 10px;">职业</div>
+                    <div class="stat-number" style="color: #333; font-size: 22px;">IT咨询</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">PMP认证</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: 深度画像 -->
+        <div id="profile" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">8维度深度人格分析</h2>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度一：基础人口学</div>
+                    <span class="confidence-badge confidence-high">置信度: 高</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>年龄:</strong> 约31岁（1994年生）</p>
+                    <p><strong>性别:</strong> 男</p>
+                    <p><strong>城市:</strong> 北京（海淀区附近，有提到海淀美食）</p>
+                    <p><strong>职业:</strong> IT咨询（前背包旅行客/自由摄影师）</p>
+                    <p><strong>教育:</strong> 硕士或以上（7年理论学科学习后转型）</p>
+                    <p><strong>旅行成就:</strong> 已踏足全球195个国家中的75个（签名"75/195 🌍"的含义）</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度二：消费与生活方式</div>
+                    <span class="confidence-badge confidence-high">置信度: 高</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>消费能力:</strong> 中上水平（独立买房、环球旅行但注重性价比——"花2K老挝躺平"、"直飞1K5"）</p>
+                    <p><strong>品牌偏好:</strong> 不追求奢侈品，注重体验消费（演唱会、旅行、美食）</p>
+                    <p><strong>核心兴趣:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>🌍 旅行（绝对核心——62条笔记中56%是旅行相关）</li>
+                        <li>📸 摄影（前自由摄影师）</li>
+                        <li>🎵 音乐（为四大乐队跨国飞行）</li>
+                        <li>🍜 美食探店（海淀区美食评测）</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>生活方式:</strong> "数字游民"式——工作在北京扎根，假期满世界飞；工作生活平衡意识强</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度三：心理与人格 - Big Five分析</div>
+                    <span class="confidence-badge confidence-high">置信度: 中高</span>
+                </div>
+                <div class="dimension-content">
+                    <div class="big5-chart" style="position: relative; width: 100%; height: 350px;">
+                        <canvas id="big5Chart"></canvas>
+                    </div>
+
+                    <p><strong style="color: #FF2442;">开放性(Openness): 95/100</strong></p>
+                    <p style="font-size: 13px; margin-bottom: 15px;">极度开放，敢于突破与尝试。走遍70国、从摄影师转IT、热爱音乐，证明思维灵活且好奇心强。</p>
+
+                    <p><strong style="color: #FF2442;">尽责性(Conscientiousness): 85/100</strong></p>
+                    <p style="font-size: 13px; margin-bottom: 15px;">高度自律。独立买房还贷、PMP认证、职业转型成功、提前还贷50万，都体现强执行力。</p>
+
+                    <p><strong style="color: #FF2442;">外向性(Extroversion): 70/100</strong></p>
+                    <p style="font-size: 13px; margin-bottom: 15px;">中等偏高。热爱旅行社交但不依赖，能独行；评论友善但有分寸；不喜欢"乏味社交"。</p>
+
+                    <p><strong style="color: #FF2442;">宜人性(Agreeableness): 80/100</strong></p>
+                    <p style="font-size: 13px; margin-bottom: 15px;">较高同理心与温暖。孝顺母亲（专程办50岁生日）、巨蟹座特质明显、评论区互动友善。</p>
+
+                    <p><strong style="color: #FF2442;">神经质(Neuroticism): 20/100</strong></p>
+                    <p style="font-size: 13px;">情绪稳定，心态成熟。从容貌焦虑走向自我接纳，人生三大感悟证明心理建设能力强。</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度四：核心价值观 与 沟通风格</div>
+                    <span class="confidence-badge confidence-high">置信度: 中高</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>5大核心价值观（按优先级）:</strong></p>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>自由:</strong> 旅行、独立生活、不被约束</li>
+                        <li><strong>成长:</strong> "做减法、爱自己、跳出比较链"</li>
+                        <li><strong>真诚:</strong> 拒绝乏味社交，强调深度连接</li>
+                        <li><strong>独立:</strong> 一个人旅行、买房、做决定</li>
+                        <li><strong>体验:</strong> 旅行体验 > 物质消费</li>
+                    </ol>
+
+                    <p style="margin-top: 15px;"><strong>沟通风格:</strong> 文艺但不矫情，会引用歌词和影视作品但有自己的思考深度；表达精准，用词考究；善于讲故事。</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度五：社会关系 与 影响力</div>
+                    <span class="confidence-badge confidence-medium">置信度: 中</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>KOL类型:</strong> 旅行领域垂直KOL（5272粉丝，精准度高）</p>
+                    <p><strong>互动特征:</strong> 高质量内容型，不是频繁更新型；精选笔记、精选互动</p>
+                    <p><strong>粉丝基数:</strong> 5万多赞与收藏，评论区活跃度高（最高单条笔记2312条评论）</p>
+                    <p><strong>社群画像:</strong> 旅行爱好者、北漂青年、音乐迷、自我成长追求者</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度六：时间行为模式</div>
+                    <span class="confidence-badge confidence-medium">置信度: 中</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>发布频率:</strong> 不固定，攒到有高质量内容才发</p>
+                    <p><strong>活跃周期:</strong> 2022-2025年持续活跃</p>
+                    <p><strong>内容演变:</strong> 早期更多纯旅行攻略 → 近期增加生活感悟、音乐热情、人生反思</p>
+                    <p><strong>最高赞笔记:</strong> "香港好像和以前不一样了"(2361赞)，说明对社会变化有观察力</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度七：社交互动偏好</div>
+                    <span class="confidence-badge confidence-medium">置信度: 中</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>回复风格:</strong> 友善、随性，愿意与评论区互动</p>
+                    <p><strong>偏好互动类型:</strong> 有见解的评论 > 普通夸赞 > 无意义点赞</p>
+                    <p><strong>评论区氛围:</strong> 高互动性、温暖且不虚伪</p>
+                </div>
+            </div>
+
+            <div class="dimension-item">
+                <div class="dimension-header">
+                    <div class="dimension-title">维度八："吸引力密码"解读</div>
+                    <span class="confidence-badge confidence-high">置信度: 高</span>
+                </div>
+                <div class="dimension-content">
+                    <p><strong>最引以为豪的身份:</strong> 环球旅行家（置顶笔记就是"25岁环游50国，我眼中旅行的意义"）</p>
+                    <p><strong>在意的品质:</strong> 独立、真诚、有深度、不随波逐流</p>
+                    <p><strong>社交需求:</strong> 渴望深度连接而非表面社交（原文："极致视听体验带来的幸福感，远胜过许多乏味社交"）</p>
+                    <p><strong>自我认知:</strong> 能够自嘲但不自贬；从容貌焦虑走向自我接纳；热爱分享但保持专业界限</p>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                ⚠️ <strong>重要声明:</strong> 上述分析基于62条公开社交媒体笔记内容推断，虽然交叉验证过，但心理推断难免有偏差。本分析不等同于专业心理评估，仅供参考。
+            </div>
+        </div>
+
+        <!-- TAB 3: 理想型推断 -->
+        <div id="ideal" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">💜 理想型画像推断</h2>
+
+            <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #FF2442;">
+                <p style="font-size: 14px; line-height: 1.8;">
+                    <strong>核心洞察:</strong> 他的理想伴侣不是"小迷妹"，而是"有自己故事的旅行者"。基于Byrne相似-吸引范式、Watson Big Five理论、Aron自我扩展模型等心理学依据，推断他的理想型需要具备以下品质。
+                </p>
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #333;">心理学基础</h3>
+
+            <div class="theory-box">
+                <div class="theory-label">1. Byrne相似-吸引范式</div>
+                我们被与自己相似的人吸引。他极度热爱旅行、音乐，所以会被有同样热情的人吸引。但不是完全相同，而是互补。
+            </div>
+
+            <div class="theory-box">
+                <div class="theory-label">2. Watson Big Five匹配</div>
+                他的高开放性(95)需要匹配接近的开放性(80+)；他的高尽责性(85)说明他也希望对方有上进心；他的情绪稳定性意味着需要安全型依恋的伴侣。
+            </div>
+
+            <div class="theory-box">
+                <div class="theory-label">3. Aron自我扩展模型</div>
+                他已经走过70个国家、见过很多风景。能吸引他的人需要在某些领域超越他（比如某一领域的专业深度、艺术才华、独特见解）。
+            </div>
+
+            <div class="theory-box">
+                <div class="theory-label">4. Bowlby依恋理论</div>
+                他从容貌焦虑走向自我接纳，说明他正在建立安全型依恋。他需要的伴侣既能理解他的独立性，也能给予情感稳定和温暖。
+            </div>
+
+            <div class="theory-box">
+                <div class="theory-label">5. Dweck成长型思维</div>
+                他极度重视自我成长（三大人生感悟、不断旅行、职业转型），会被同样具有成长心态的人吸引。
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">6维度理想型雷达图</h3>
+            <div class="ideal-radar">
+                <canvas id="idealRadar"></canvas>
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">理想型6维度详解</h3>
+
+            <div class="ideal-dimension">
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">① 审美共鸣力</div>
+                    <div class="ideal-dimension-score">85/100</div>
+                    <div class="ideal-dimension-desc">
+                        他偏好自然、旅行风、不做作的审美。看他的笔记配图，照片质感强但不滤镜堆砌。需要你的审美是"清爽而有质感"，而非"精致而刻意"。
+                    </div>
+                </div>
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">② 文化视野</div>
+                    <div class="ideal-dimension-score">90/100</div>
+                    <div class="ideal-dimension-desc">
+                        必须能聊旅行、音乐、世界各地文化。最好你也去过3个以上国家、听过他喜欢的乐队、对不同文化有好奇心。这不是装逼，而是真实的思维碰撞。
+                    </div>
+                </div>
+            </div>
+
+            <div class="ideal-dimension">
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">③ 自我扩展力</div>
+                    <div class="ideal-dimension-score">80/100</div>
+                    <div class="ideal-dimension-desc">
+                        他见多识广，所以需要在某个领域有独到见解或专业深度的人。可能你是书法家、音乐人、设计师，或者在某个国家生活过。核心是"你有他没有的"。
+                    </div>
+                </div>
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">④ 安全型依恋</div>
+                    <div class="ideal-dimension-score">75/100</div>
+                    <div class="ideal-dimension-desc">
+                        他经常说"一个人也很好"，所以需要能理解他的独立性。你不能是"需要他"的人，而是"选择他"的人。既独立又温暖。
+                    </div>
+                </div>
+            </div>
+
+            <div class="ideal-dimension">
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">⑤ 成长型人格</div>
+                    <div class="ideal-dimension-score">85/100</div>
+                    <div class="ideal-dimension-desc">
+                        他非常欣赏有自驱力、不断进步的人。你需要有自己的目标和梦想，不能是"围绕他转"的人。最好你也在某个领域努力精进。
+                    </div>
+                </div>
+                <div class="ideal-dimension-card">
+                    <div class="ideal-dimension-title">⑥ 情感联结力</div>
+                    <div class="ideal-dimension-score">70/100</div>
+                    <div class="ideal-dimension-desc">
+                        他的表达是有深度但不外放的。不需要你特别热情，而是需要能"读懂他文字"的人。当他说"快乐是选择"时，你能理解他的人生哲学。
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">🎯 你的匹配度测试</h3>
+
+            <div class="assessment-container">
+                <p style="margin-bottom: 30px; font-size: 14px; color: #666;">根据上面的6个维度，在下面的滑块上标记你的得分。诚实作答会获得更准确的匹配度。</p>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>① 审美共鸣力</span>
+                        <span class="slider-value" id="val-1">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="1" onchange="updateSliderValue(this)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>② 文化视野</span>
+                        <span class="slider-value" id="val-2">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="2" onchange="updateSliderValue(this)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>③ 自我扩展力</span>
+                        <span class="slider-value" id="val-3">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="3" onchange="updateSliderValue(this)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>④ 安全型依恋</span>
+                        <span class="slider-value" id="val-4">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="4" onchange="updateSliderValue(this)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>⑤ 成长型人格</span>
+                        <span class="slider-value" id="val-5">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="5" onchange="updateSliderValue(this)">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>⑥ 情感联结力</span>
+                        <span class="slider-value" id="val-6">50</span>/100
+                    </div>
+                    <input type="range" min="0" max="100" value="50" class="dimension-slider" data-dimension="6" onchange="updateSliderValue(this)">
+                </div>
+
+                <button onclick="calculateMatch()" style="width: 100%; padding: 15px; background: #FF2442; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 30px;">计算匹配度</button>
+
+                <div id="matchResult" class="match-result">
+                    <div class="match-percentage" id="matchPercentage">--</div>
+                    <div class="match-text" id="matchText"></div>
+                    <div class="match-feedback" id="matchFeedback"></div>
+                </div>
+            </div>
+
+            <div class="disclaimer" style="margin-top: 40px;">
+                ⚠️ 此测试仅供娱乐参考，不代表真实的人格匹配度。真正的感情连接远比数据复杂和珍贵。
+            </div>
+        </div>
+
+        <!-- TAB 4: 笔记一览 -->
+        <div id="notes" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">62条笔记完整一览</h2>
+
+            <div class="search-box">
+                <input type="text" id="noteSearch" placeholder="搜索笔记内容..." onkeyup="filterNotes()">
+            </div>
+
+            <div class="category-filter">
+                <button class="filter-btn active" onclick="filterByCategory('all')">全部</button>
+                <button class="filter-btn" onclick="filterByCategory('travel')">旅行/攻略 (35)</button>
+                <button class="filter-btn" onclick="filterByCategory('growth')">个人成长 (8)</button>
+                <button class="filter-btn" onclick="filterByCategory('music')">音乐演唱会 (5)</button>
+                <button class="filter-btn" onclick="filterByCategory('domestic')">国内探索 (5)</button>
+                <button class="filter-btn" onclick="filterByCategory('finance')">理财职场 (4)</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60%;">笔记标题</th>
+                        <th style="width: 20%;">分类</th>
+                        <th style="width: 20%;">点赞数</th>
+                    </tr>
+                </thead>
+                <tbody id="notesTable">
+                </tbody>
+            </table>
+
+            <div class="disclaimer" style="margin-top: 30px;">
+                所有笔记数据来自公开信息，点赞数为收集时数据，可能存在更新。
+            </div>
+        </div>
+
+        <!-- TAB 5: 追求策略 -->
+        <div id="strategy" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">追求策略完整指南</h2>
+
+            <div class="summary-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <strong>核心策略原则:</strong> "做一个有故事的旅行者，而非追逐他的粉丝"
+            </div>
+
+            <div class="strategy-section">
+                <div class="strategy-title">✅ Do's - 应该这样做</div>
+                <div class="do-list">
+                    <h4>提升成功概率的行为</h4>
+                    <ul>
+                        <li>展现你自己的旅行经历或独特兴趣，而不是模仿他</li>
+                        <li>用有见地的评论切入，而非简单夸赞外貌或点赞</li>
+                        <li>匹配他的文艺表达风格但保持真实，不要假文青</li>
+                        <li>选择低赞数笔记评论（被看到的概率更高）</li>
+                        <li>展示音乐品味——提到他喜欢的乐队或你的音乐故事</li>
+                        <li>提问比陈述更有效——"你觉得..."比"我觉得..."更容易获得回应</li>
+                        <li>保持友好但有分寸的互动频率（3-5天一次）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="strategy-section">
+                <div class="strategy-title">❌ Don'ts - 绝对不要做</div>
+                <div class="dont-list">
+                    <h4>会降低吸引力的行为</h4>
+                    <ul>
+                        <li>不要当"小迷妹"式追星——他讨厌乏味社交</li>
+                        <li>不要泛泛夸赞他的外貌——他已经走出容貌焦虑</li>
+                        <li>不要频繁评论每一条笔记显得刻意——会显得没有生活</li>
+                        <li>不要在第一条评论就问私密问题或邀约见面</li>
+                        <li>不要简单地说"好厉害"——他需要有深度的对话</li>
+                        <li>不要假装热爱旅行但实际没有行动——真诚度很重要</li>
+                        <li>不要询问他的感情状况——容易显得别有用心</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="strategy-section">
+                <div class="strategy-title">5个追求阶段详解</div>
+
+                <div class="phase-card">
+                    <div class="phase-title">📍 Phase 1: 刷存在感（1-2周）</div>
+                    <div class="phase-content">
+                        <p><strong>目标:</strong> 让他知道你这个人，但不过度。</p>
+                        <p style="margin-top: 10px;"><strong>执行方案:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>在3-4条笔记下留有深度的评论</li>
+                            <li>选择低赞笔记（50-90赞范围）：古巴、黑山、塞浦路斯、塞尔维亚等地理位置笔记</li>
+                            <li>每条评论3-5句，有观点、有提问、有共鸣</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>示例评论:</strong></p>
+
+                        <div class="example-text">
+                            <strong>评论位置:</strong> "古巴｜切•格瓦拉的浪漫与勇敢"<br><br>
+                            "读完这篇脑海里浮现的全是《摩托日记》的画面，切•格瓦拉那句'旅行改变了我看世界的方式'放在你身上也是一样的。下次去古巴想去看看海明威的Finca Vigía，你有去过吗？"
+                        </div>
+
+                        <div class="example-text">
+                            <strong>评论位置:</strong> "集齐四大乐队，你们让我一次次爱上这个世界"<br><br>
+                            "看到你飞首尔看Coldplay真的太懂了！我一直觉得Music of the Spheres这张专辑是他们最有宇宙感的一张。你觉得四支乐队里现场体验最震撼的是哪一支？"
+                        </div>
+
+                        <div class="example-text">
+                            <strong>评论位置:</strong> "今晚又看请回答1988了，试唱一下主题曲"<br><br>
+                            "1988里我最喜欢的一句台词是'大人只是在忍，只是在用故作坚强来承担年龄的重量'。看你的笔记，感觉你也是在北京一个人用行动诠释成长。"
+                        </div>
+
+                        <div class="branching">
+                            <strong>分支判断:</strong>
+                            <div class="branching-item">
+                                <strong style="color: #22c55e;">积极回应</strong>: 他回复了你的评论 → 继续互动，但控制频率（3-5天一次）
+                            </div>
+                            <div class="branching-item">
+                                <strong style="color: #eab308;">只点赞</strong>: 他看到了但没文字回复 → 换一条笔记评论，调整切入角度
+                            </div>
+                            <div class="branching-item">
+                                <strong style="color: #ef4444;">无回应</strong>: 正常，继续留2-3条高质量评论，不要放弃
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-title">📍 Phase 2: 建立连接（2-4周）</div>
+                    <div class="phase-content">
+                        <p><strong>目标:</strong> 从评论区走向私信，开始深层对话。</p>
+                        <p style="margin-top: 10px;"><strong>执行时机:</strong> 当他回复过你至少2次评论后。</p>
+                        <p style="margin-top: 10px;"><strong>首条私信3个版本（选择最符合你的）:</strong></p>
+
+                        <div class="example-text">
+                            <strong>V1 - 旅行切入:</strong><br><br>
+                            "嗨～看了你好多旅行笔记，你写的巴基斯坦罕萨山谷让我种草了很久。我最近在计划今年的第一次出行，想问问你觉得一个人去巴基斯坦安全吗？有什么必须注意的吗？"
+                        </div>
+
+                        <div class="example-text">
+                            <strong>V2 - 音乐切入:</strong><br><br>
+                            "你好呀！看到你集齐四大乐队太让人羡慕了。我也是Coldplay的粉丝，看你去了首尔场，今年他们还有巡演计划吗？我也想策划一次音乐旅行！"
+                        </div>
+
+                        <div class="example-text">
+                            <strong>V3 - 轻松日常:</strong><br><br>
+                            "看了你那条海淀区神仙外卖，终于找到了组织😂 你推荐的那家XX我上周试了，真的太好吃了！你平时还有什么私藏店吗？"
+                        </div>
+
+                        <div class="branching">
+                            <strong>分支判断:</strong>
+                            <div class="branching-item">
+                                <strong style="color: #22c55e;">热情回复</strong>: 回复内容超过3句、有问候有提问 → 保持对话节奏（不要秒回，也不要隔太久）
+                            </div>
+                            <div class="branching-item">
+                                <strong style="color: #eab308;">简短回复</strong>: 只回了1-2句 → 不要追问，在你的回复中留个尾巴下次继续
+                            </div>
+                            <div class="branching-item">
+                                <strong style="color: #ef4444;">不回</strong>: 等1-2周再尝试换话题，或继续在其他笔记下评论
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-title">📍 Phase 3: 深入了解（3-6周）</div>
+                    <div class="phase-content">
+                        <p><strong>目标:</strong> 从表面互动到实质对话，展现你的深度。</p>
+                        <p style="margin-top: 10px;"><strong>话题推进方向:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>旅行 → 音乐 → 人生感悟 → 日常生活</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>关键技巧:</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>分享你自己的故事（他重视"有深度"的人）</li>
+                            <li>聊天不要只问他问题，也要主动分享你的经历</li>
+                            <li>当他提到某个国家时，如果你去过就分享你的独特感受</li>
+                            <li>发现共鸣点（比如都是巨蟹座、都有摄影爱好等）</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>转微信的时机与话术:</strong></p>
+                        <p style="margin-top: 10px;">当对话连续3次以上、每次超过5句的时候。</p>
+
+                        <div class="example-text">
+                            "感觉小红书聊天好不方便啊，你有微信吗？下次找到好吃的或者有趣的东西可以直接分享给你哈"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-title">📍 Phase 4: 线下见面（4-8周）</div>
+                    <div class="phase-content">
+                        <p><strong>目标:</strong> 从虚拟到现实，验证线上感受。</p>
+                        <p style="margin-top: 10px;"><strong>三个量身定制的约会场景:</strong></p>
+
+                        <p style="margin-top: 15px; font-weight: 600; color: #FF2442;">🎵 场景一：音乐主题</p>
+                        <p>一起去看演唱会或livehouse。他为音乐跨国飞，这是最高效的约会场景。</p>
+                        <p style="font-size: 13px; color: #999; margin-top: 10px;">话术: "最近有什么演唱会吗？我也想去，要不一起？"</p>
+
+                        <p style="margin-top: 20px; font-weight: 600; color: #FF2442;">🍜 场景二：美食探店</p>
+                        <p>海淀区美食探店。他发过海淀外卖评测，说明住海淀附近。</p>
+                        <p style="font-size: 13px; color: #999; margin-top: 10px;">话术: "你推荐的那家XX我想去试试，要不有空一起？我也想发现更多神仙餐厅"</p>
+
+                        <p style="margin-top: 20px; font-weight: 600; color: #FF2442;">🏔️ 场景三：户外轻徒步</p>
+                        <p>首钢园/阿那亚一日游。他发过相关攻略，说明很适合约会。</p>
+                        <p style="font-size: 13px; color: #999; margin-top: 10px;">话术: "你的首钢园攻略我看了，有空陪我去一趟吗？"</p>
+                    </div>
+                </div>
+
+                <div class="phase-card">
+                    <div class="phase-title">📍 Phase 5: 关系升温（6-12周）</div>
+                    <div class="phase-content">
+                        <p><strong>目标:</strong> 从朋友关系过渡到情感关系。</p>
+                        <p style="margin-top: 10px;"><strong>核心要点:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>展现独立性（他最看重的品质）——有自己的目标和梦想</li>
+                            <li>分享各自的旅行故事和成长经历</li>
+                            <li>制造共同回忆（一起去过的地方、一起听过的演唱会）</li>
+                            <li>适当展露脆弱一面（他喜欢真诚，不要一直很强硬）</li>
+                        </ul>
+
+                        <p style="margin-top: 15px;"><strong>表白时机判断:</strong></p>
+                        <p>当他主动跟你分享未来计划或旅行愿望时，就是合适的时机。表白不一定非要很隆重，反而自然而然最有效。</p>
+
+                        <div class="example-text">
+                            你们在一起看了某个地方的日落或演唱会，他说"真想一直和你看这样的风景"，这就是表白的最好时机。你可以回应："我也是"，然后自然而然地靠近他。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer" style="margin-top: 40px;">
+                ⚠️ 本策略基于心理学研究和数据分析，但人与人的互动永远充满变数。最重要的是保持真诚和尊重——如果他没有回应，就要学会放手。真正的连接是双向的。
+            </div>
+        </div>
+
+        <!-- TAB 6: 话术锦囊 -->
+        <div id="tactics" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">💬 评论与私信话术模板</h2>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #333;">📍 旅行/攻略类笔记评论模板</h3>
+
+            <div class="example-text">
+                <strong>模板1 - 经验共鸣:</strong><br><br>
+                "我也去过[地点]！你这个[角度/拍摄地点]我之前没有注意到，下次一定要去。[你的经历或感受]。对了，你觉得[相关问题]？"
+            </div>
+
+            <div class="example-text">
+                <strong>模板2 - 种草型:</strong><br><br>
+                "这篇笔记真的有点绝了！[具体细节]让我特别想去。最想体验的是[你的兴趣点]。你觉得[开放式问题]？"
+            </div>
+
+            <div class="example-text">
+                <strong>模板3 - 文艺型:</strong><br><br>
+                "看你的照片和文字，[地点名字]就活起来了。你写的'[引用其中一句话]'，真的戳到我了。有没有考虑[相关话题]？"
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">🎵 音乐/演唱会类笔记评论模板</h3>
+
+            <div class="example-text">
+                <strong>模板1 - 粉丝共鸣:</strong><br><br>
+                "天呐你也是[乐队]的粉丝！我最喜欢的歌是[歌名]，现场听[他提到的歌或乐队]怎么样？有机会真想一起去看[乐队]。"
+            </div>
+
+            <div class="example-text">
+                <strong>模板2 - 音乐见解:</strong><br><br>
+                "你这句'[引用他的观点]'说得特别对。[乐队/歌手]这个阶段的作品确实[你的看法]。你下次还会去看他们的演唱会吗？"
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">💭 个人成长/感悟类笔记评论模板</h3>
+
+            <div class="example-text">
+                <strong>模板1 - 深度共鸣:</strong><br><br>
+                "你说的'[核心观点]'太有深度了。我也经历过[相关经历]，所以特别理解[他的感受]。这个过程中，[你的反思]。"
+            </div>
+
+            <div class="example-text">
+                <strong>模板2 - 提问式对话:</strong><br><br>
+                "读完这篇，我在思考[相关问题]。我特别想听听你的看法，因为你好像已经想得很透彻了。对你来说，[深入问题]最重要的是什么？"
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">📱 私信开场白模板（已在策略章节详述）</h3>
+
+            <div class="example-text">
+                <strong>旅行切入:</strong> "嗨～看了你好多旅行笔记，你写的[具体笔记]让我种草了很久。我最近在计划[相关计划]，想问问你[具体问题]？"
+            </div>
+
+            <div class="example-text">
+                <strong>音乐切入:</strong> "你好呀！看到你[音乐相关成就]太让人羡慕了。我也是[艺术家]的粉丝，[相关问题]。我也想[相关计划]！"
+            </div>
+
+            <div class="example-text">
+                <strong>日常切入:</strong> "看了你那条[具体笔记]，终于找到了组织😂 你推荐的[具体项目]我试了，真的太好了！你平时还有什么[相关话题]吗？"
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; margin-top: 30px; color: #333;">💬 私信推进话题模板</h3>
+
+            <div class="example-text">
+                <strong>模板1 - 自然过渡:</strong><br><br>
+                "对了，我最近也在[相关话题]，发现了[你的发现]，和你的想法有点不一样。你怎么看？"
+            </div>
+
+            <div class="example-text">
+                <strong>模板2 - 引导分享:</strong><br><br>
+                "感觉你特别有故事，你说的这个经历让我特别好奇。能再讲讲[相关细节]吗？"
+            </div>
+
+            <div class="example-text">
+                <strong>模板3 - 建议约见面:</strong><br><br>
+                "最近[地点/演唱会/美食]特别热，要不有空一起去？我特别想听听你[相关话题]的想法。"
+            </div>
+
+            <div class="disclaimer">
+                ⚠️ 这些都是模板，核心是<strong>根据实际情况调整</strong>，保持真诚。千万不要照搬，那样会显得特别生硬。最好的话术永远是你自己的声音。
+            </div>
+        </div>
+
+        <!-- TAB 7: 方法论 -->
+        <div id="method" class="tab-content">
+            <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 30px; color: #FF2442;">ℹ️ 数据与分析方法论</h2>
+
+            <div class="method-section">
+                <div class="method-title">📊 数据收集报告</div>
+                <div class="method-content">
+                    <p><strong>样本范围:</strong> 旅行者小K小红书账号公开内容</p>
+                    <p><strong>笔记总数:</strong> 62条（完整收集）</p>
+                    <p><strong>时间跨度:</strong> 2022年-2025年</p>
+                    <p><strong>数据类型:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>笔记标题和点赞数</li>
+                        <li>个人签名和标签</li>
+                        <li>粉丝/关注/互动数据</li>
+                        <li>头像和视觉信息</li>
+                        <li>笔记内容深度阅读（4条代表性笔记）</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>数据局限:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>收藏夹已设置不可见，无法获取收藏偏好</li>
+                        <li>评论区样本量有限，未能全量分析</li>
+                        <li>私信历史无法获取</li>
+                        <li>粉丝构成和地理分布无法获知</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="method-section">
+                <div class="method-title">🔬 分析方法</div>
+                <div class="method-content">
+                    <p><strong>1. 内容分类法</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>将62条笔记按主题分为7类：旅行(56%)、成长(13%)、音乐(8%)、国内(8%)、理财(6%)、美食(5%)、穿搭(3%)</li>
+                        <li>通过点赞数高低识别核心兴趣（置顶笔记分析）</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Big Five人格模型（Costa & McCrae, 1992）</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>开放性(O): 通过旅行国数、职业转型、文艺表达判断（95/100）</li>
+                        <li>尽责性(C): 通过房贷还清进度、PMP认证判断（85/100）</li>
+                        <li>外向性(E): 通过社交频度和评论互动判断（70/100）</li>
+                        <li>宜人性(A): 通过孝顺表现和评论风格判断（80/100）</li>
+                        <li>神经质(N): 通过容貌焦虑解决和情绪表达判断（20/100）</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. 心理学理论应用</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Byrne相似-吸引范式:</strong> 推断他会被旅行爱好者吸引</li>
+                        <li><strong>Aron自我扩展模型:</strong> 推断他需要能"扩展他世界"的伴侣</li>
+                        <li><strong>Bowlby依恋理论:</strong> 分析他的独立性和情感需求</li>
+                        <li><strong>Dweck成长心态:</strong> 识别他的自我完善追求</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. 文本分析</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>关键词频率分析（旅行、成长、音乐等核心词出现频次）</li>
+                        <li>引用分析（引用电影、歌词、书籍的内容和频度）</li>
+                        <li>表达风格分析（文艺程度、深度思考的迹象）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="method-section">
+                <div class="method-title">⚠️ 分析局限与假设</div>
+                <div class="method-content">
+                    <p><strong>已知局限:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>所有推断基于公开信息，可能存在与实际情况的偏差</li>
+                        <li>心理学人格评估需要专业工具（MBTI、MMPI等），本分析仅基于行为推断</li>
+                        <li>社交媒体呈现的自我往往是精选版，可能与真实自我存在差异</li>
+                        <li>单个人的数据样本量有限，结论普遍性待考</li>
+                        <li>点赞数受多种因素影响（发布时间、话题热度等），不完全反映质量</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>关键假设:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>假设笔记内容反映真实兴趣和价值观</li>
+                        <li>假设他的签名"快乐是选择"代表核心人生哲学</li>
+                        <li>假设62条笔记的内容分布代表他的真实偏好</li>
+                        <li>假设没有伴侣信息意味着单身（这是最大的推断风险）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="method-section">
+                <div class="method-title">📚 参考理论框架</div>
+                <div class="method-content">
+                    <p><strong>1. Byrne相似-吸引范式（Byrne, 1971）</strong></p>
+                    <p style="margin-left: 20px; margin-top: 10px; font-size: 13px;">人倾向于被与自己相似的人吸引。态度相似度越高，吸引力越强。</p>
+
+                    <p style="margin-top: 15px;"><strong>2. Watson Big Five理论（Costa & McCrae, 1992）</strong></p>
+                    <p style="margin-left: 20px; margin-top: 10px; font-size: 13px;">人格由五大维度构成，每个维度的配对会影响人际关系质量。高开放性的人通常需要配对相近的开放性伴侣。</p>
+
+                    <p style="margin-top: 15px;"><strong>3. Aron自我扩展模型（Aron & Aron, 1986）</strong></p>
+                    <p style="margin-left: 20px; margin-top: 10px; font-size: 13px;">人们被能够"扩展自我"的人吸引。通过与对方的关系，自己的能力范围和视野得到扩展。</p>
+
+                    <p style="margin-top: 15px;"><strong>4. Bowlby依恋理论（Bowlby, 1969）</strong></p>
+                    <p style="margin-left: 20px; margin-top: 10px; font-size: 13px;">早期依恋体验塑造成人的亲密关系模式。安全型依恋的人寻求情感安全和自主空间的平衡。</p>
+
+                    <p style="margin-top: 15px;"><strong>5. Dweck成长心态（Dweck, 2006）</strong></p>
+                    <p style="margin-left: 20px; margin-top: 10px; font-size: 13px;">具有成长心态的人相信能力可以通过努力提升，会被同样具有成长心态的人吸引。</p>
+                </div>
+            </div>
+
+            <div class="method-section">
+                <div class="method-title">🎯 策略有效性评估</div>
+                <div class="method-content">
+                    <p>本分析中提出的"5阶段追求策略"基于以下原理：</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>阶段1-2（评论→私信）:</strong> 基于Foot-in-the-door技术和熟悉度原理</li>
+                        <li><strong>阶段3（话题深化）:</strong> 基于自我披露和互惠原理</li>
+                        <li><strong>阶段4（线下见面）:</strong> 基于情感靠近和环境耦合原理</li>
+                        <li><strong>阶段5（关系升温）:</strong> 基于承诺一致性和互依理论</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 13px;">然而，任何单一策略都无法保证感情成功——人与人的连接涉及太多变数和随机性。最重要的是真诚、尊重和双向互动。</p>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                <strong>终极声明:</strong> 此分析仅基于公开社交媒体内容，结合心理学研究结论，<strong>不等同于专业心理评估</strong>。仅供参考。所有涉及感情的决定都应该基于对现实关系的持续观察和真诚沟通，而不是事前分析和套路。真正重要的是：当你们见面后，他觉得舒服吗？你们能自然地对话吗？这些永远比任何数据更真实。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Notes data
+        const notesData = [
+            { title: '25岁环游50国，我眼中旅行的意义', category: 'travel', likes: 551 },
+            { title: '孙燕姿内地场唯一安可！南京收官《开始懂了》', category: 'music', likes: 33 },
+            { title: '巴塞罗那 | 亲爱的宛瑜，我终于理解了你', category: 'travel', likes: 95 },
+            { title: '十月的南京是不是可以穿《风衣》了😢', category: 'domestic', likes: 182 },
+            { title: '环球旅行第70国，最珍贵的永远是少年游', category: 'travel', likes: 81 },
+            { title: '完全不像非洲‼️在沙海相遇处的人生照片🇳🇦', category: 'travel', likes: 67 },
+            { title: '集齐四大乐队，你们让我一次次爱上这个世界', category: 'music', likes: 391 },
+            { title: '过年不回家，我终于拥有属于自己的罗马假日', category: 'travel', likes: 73 },
+            { title: '30岁环游60国，我最难忘的5次旅行', category: 'travel', likes: 222 },
+            { title: '一生一定要去一次的开普敦❗️【三天两夜攻略】', category: 'travel', likes: 149 },
+            { title: '岳阳，一座被低估的宝藏小城｜1️⃣日游攻略', category: 'domestic', likes: 119 },
+            { title: '三十而已🎂这更像我想象中的18岁', category: 'growth', likes: 202 },
+            { title: '🇮🇪爱尔兰似乎比英国更热情和自由', category: 'travel', likes: 272 },
+            { title: '伦敦的晴天是最好的嘉奖｜两日游最佳路线', category: 'travel', likes: 83 },
+            { title: '🦘澳大利亚的松弛感让我想原地躺平', category: 'travel', likes: 79 },
+            { title: 'Fate乱跳｜和好朋友一起出行的无边快乐🎉', category: 'travel', likes: 81 },
+            { title: '🇹🇭曼谷网红天桥打卡及详细地址', category: 'travel', likes: 262 },
+            { title: '直飞往返只要1K5！这个被低估的国家值得一去', category: 'travel', likes: 61 },
+            { title: '香港好像和以前不一样了', category: 'travel', likes: 2361 },
+            { title: '台湾桃园机场转机攻略｜无需入境', category: 'travel', likes: 682 },
+            { title: '🇺🇸美国出差之西雅图夜未眠', category: 'travel', likes: 253 },
+            { title: '旧金山攻略｜周末Citywalk最佳路线', category: 'travel', likes: 493 },
+            { title: '我在巴基斯坦等风来｜罕萨山谷最新攻略', category: 'travel', likes: 106 },
+            { title: '格鲁吉亚，这个最新免签国美得超乎想象！', category: 'travel', likes: 74 },
+            { title: '第一次试西装被店员说像斯文败类😂', category: 'growth', likes: 158 },
+            { title: '环球旅行半年花费8W，我怀念的是这样的自己', category: 'travel', likes: 327 },
+            { title: '新加坡10分钟丝滑入境！收藏这篇攻略就够了✅', category: 'travel', likes: 72 },
+            { title: '北京出发｜济州岛4天3晚自由行攻略', category: 'travel', likes: 167 },
+            { title: '在新加坡搬砖的一周结束（附攻略）', category: 'travel', likes: 107 },
+            { title: '空中女王｜国航波音747二层公务舱初体验', category: 'travel', likes: 164 },
+            { title: '在朝鲜穿越回80年代的4天3晚🇰🇵', category: 'travel', likes: 93 },
+            { title: '花2K在老挝快乐躺平的5天4晚✌️', category: 'travel', likes: 79 },
+            { title: '阿那亚真的好多人啊😅｜2天1夜最新攻略', category: 'domestic', likes: 834 },
+            { title: '提前还完一半房贷，一个人我也做到啦！', category: 'finance', likes: 332 },
+            { title: '土耳其10天4城自由行，攻略看这篇就够了！', category: 'travel', likes: 144 },
+            { title: '推荐这3个地方作为第一次出国的首选！', category: 'travel', likes: 287 },
+            { title: '2023出境游，推荐5个值得一去的免签好地', category: 'travel', likes: 4069 },
+            { title: '4个月环游20国，这样的朋友圈我曾发过五年', category: 'travel', likes: 209 },
+            { title: '北漂四年攒下100万，亲测实用的思维习惯', category: 'finance', likes: 179 },
+            { title: '北京可以穿短裤的最后一天', category: 'domestic', likes: 102 },
+            { title: '北漂七年，第一次来故宫', category: 'domestic', likes: 142 },
+            { title: '整本护照盖满，环球旅行的仪式感', category: 'travel', likes: 751 },
+            { title: '这个夏天总要去趟青海吧', category: 'domestic', likes: 457 },
+            { title: '北漂老男孩儿的第7个生日', category: 'growth', likes: 1601 },
+            { title: '今晚又看请回答1988了，试唱一下主题曲', category: 'growth', likes: 120 },
+            { title: '我的民宿故事｜那些房东教会我的事', category: 'growth', likes: 52 },
+            { title: '提前还贷50万，这是真的有点香。', category: 'finance', likes: 1066 },
+            { title: '海淀区的十家神仙外卖', category: 'growth', likes: 823 },
+            { title: '首钢园最新半日游攻略', category: 'domestic', likes: 116 },
+            { title: '主播真不是人人都能干的', category: 'growth', likes: 688 },
+            { title: '疫情期间护照换发指南', category: 'growth', likes: 344 },
+            { title: '三年日签过期了…十年美签还会远吗？', category: 'growth', likes: 265 },
+            { title: '关于我没睡醒就被朋友抓来爬山这件事', category: 'domestic', likes: 74 },
+            { title: '塞浦路斯🇨🇾｜首都一分为二，风景以一敌十', category: 'travel', likes: 84 },
+            { title: '黑山🇲🇪｜我坐在这里看着时间溜过', category: 'travel', likes: 70 },
+            { title: '摩洛哥🇲🇦｜五年前的今天，独行在撒哈拉沙漠', category: 'travel', likes: 126 },
+            { title: '怎样才能买到便宜机票？超200次飞行的纯干货', category: 'finance', likes: 972 },
+            { title: '塞尔维亚🇷🇸｜远在欧洲的真巴铁', category: 'travel', likes: 80 },
+            { title: '28岁北漂男生，This is the part of me', category: 'growth', likes: 2590 },
+            { title: '古巴🇨🇺｜切•格瓦拉的浪漫与勇敢', category: 'travel', likes: 128 },
+            { title: '威海🌊｜北方海滨城市天花板', category: 'domestic', likes: 639 },
+            { title: '北京探店｜最好吃的四川面馆大测评🍜', category: 'growth', likes: 168 }
+        ];
+
+        // Initialize notes table
+        function initNotesTable() {
+            const tbody = document.getElementById('notesTable');
+            notesData.forEach(note => {
+                const row = document.createElement('tr');
+                row.className = `note-row cat-${note.category}`;
+                row.innerHTML = `
+                    <td>${note.title}</td>
+                    <td>
+                        <span style="font-size: 12px; padding: 4px 8px; background: #f0f0f0; border-radius: 4px;">
+                            ${getCategoryLabel(note.category)}
+                        </span>
+                    </td>
+                    <td><span class="likes-badge">${note.likes}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getCategoryLabel(cat) {
+            const labels = {
+                'travel': '旅行/攻略',
+                'growth': '个人成长',
+                'music': '音乐演唱会',
+                'domestic': '国内探索',
+                'finance': '理财职场'
+            };
+            return labels[cat] || cat;
+        }
+
+        function filterByCategory(cat) {
+            const rows = document.querySelectorAll('.note-row');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            rows.forEach(row => {
+                if (cat === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = row.classList.contains(`cat-${cat}`) ? '' : 'none';
+                }
+            });
+        }
+
+        function filterNotes() {
+            const search = document.getElementById('noteSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('.note-row');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Match calculation
+        function updateSliderValue(slider) {
+            const dim = slider.dataset.dimension;
+            document.getElementById(`val-${dim}`).textContent = slider.value;
+        }
+
+        function calculateMatch() {
+            const scores = [];
+            for (let i = 1; i <= 6; i++) {
+                const val = parseInt(document.querySelector(`[data-dimension="${i}"]`).value);
+                scores.push(val);
+            }
+
+            const idealScores = [85, 90, 80, 75, 85, 70];
+            const weights = [0.15, 0.18, 0.16, 0.15, 0.18, 0.18]; // 权重和为1
+
+            let matchScore = 0;
+            for (let i = 0; i < 6; i++) {
+                const diff = Math.abs(scores[i] - idealScores[i]);
+                const match = Math.max(0, 100 - diff);
+                matchScore += match * weights[i];
+            }
+
+            const roundedScore = Math.round(matchScore);
+            const result = document.getElementById('matchResult');
+            result.classList.add('show');
+            document.getElementById('matchPercentage').textContent = roundedScore + '%';
+
+            let feedback = '';
+            if (roundedScore >= 85) {
+                feedback = '天呐！你们的匹配度超级高！他会被你吸引的。';
+                document.getElementById('matchText').textContent = '🔥 极度匹配';
+            } else if (roundedScore >= 70) {
+                feedback = '不错！你有他需要的品质。用策略推进，有很大机会。';
+                document.getElementById('matchText').textContent = '✨ 高度匹配';
+            } else if (roundedScore >= 55) {
+                feedback = '可以一试！但要特别注意他最看重的维度（成长和文化视野）。';
+                document.getElementById('matchText').textContent = '💫 中等匹配';
+            } else {
+                feedback = '可能不太适合。或者，你可以在这些维度上继续打磨自己。';
+                document.getElementById('matchText').textContent = '⚠️ 匹配度有限';
+            }
+            document.getElementById('matchFeedback').textContent = feedback;
+        }
+
+        // Chart initialization
+        function initCharts() {
+            // Overview Radar
+            const overviewCtx = document.getElementById('overviewRadar').getContext('2d');
+            new Chart(overviewCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['开放性', '独立性', '浪漫感性', '社交影响力', '生活品质'],
+                    datasets: [{
+                        label: '个性评分',
+                        data: [95, 90, 80, 70, 85],
+                        borderColor: '#FF2442',
+                        backgroundColor: 'rgba(255, 36, 66, 0.1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#FF2442',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Big Five Chart
+            const big5Ctx = document.getElementById('big5Chart').getContext('2d');
+            new Chart(big5Ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['开放性', '尽责性', '外向性', '宜人性', '情绪稳定'],
+                    datasets: [{
+                        label: '得分',
+                        data: [95, 85, 70, 80, 80],
+                        backgroundColor: [
+                            '#FF2442',
+                            '#ff6b8a',
+                            '#ffa0b8',
+                            '#ff8aaa',
+                            '#ffb8d1'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Ideal Type Radar
+            const idealCtx = document.getElementById('idealRadar').getContext('2d');
+            new Chart(idealCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['审美共鸣力', '文化视野', '自我扩展力', '安全型依恋', '成长型人格', '情感联结力'],
+                    datasets: [{
+                        label: '理想型需求',
+                        data: [85, 90, 80, 75, 85, 70],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initNotesTable();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
